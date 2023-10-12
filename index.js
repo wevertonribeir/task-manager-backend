@@ -23,15 +23,16 @@ connection
 
 // Rota principal
 app.get("/", (req, res) => {
-    Tasks.findAll({
-        raw: true, order: [
-            ['id', 'DESC']
-        ]
-    }).then(tasks => {
-        res.render("index", {
-            tasks: tasks,
-        });
-    });
+    // Tasks.findAll({
+    //     raw: true, order: [
+    //         ['id', 'DESC']
+    //     ]
+    // }).then(tasks => {
+    //     res.render("index", {
+    //         tasks: tasks,
+    //     });
+    // });
+    res.send('teste')
 });
 
 
