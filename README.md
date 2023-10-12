@@ -5,4 +5,3 @@
 # Receber dados de Form: bodyParser
 # Linguagem de Programção: NodejS
 # FrameWork: Express
-# Fazer testes com o front: EJS

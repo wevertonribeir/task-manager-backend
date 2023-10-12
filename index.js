@@ -6,9 +6,6 @@ const Tasks = require("./database/Tasks");
 
 const port = 8484;
 
-// Estou dizendo para o Express usar o EJS como o VIEW Engine
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
 // Configurando Body Parser
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -31,9 +28,11 @@ app.get("/", (req, res) => {
             ['id', 'DESC']
         ]
     }).then(tasks => {
-        res.render("index", {
+        res.json({
             tasks: tasks,
         });
+    }).catch(error => {
+        res.status(500).json({ error: 'Internal Server Error' });
     });
 });
 
