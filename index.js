@@ -41,17 +41,7 @@ const verifyJWT = (req, res, next) => {
 
 // Rota principal
 app.get("/", (req, res) => {
-    Tasks.findAll({
-        raw: true, order: [
-            ['id', 'DESC']
-        ]
-    }).then(tasks => {
-        res.json({
-            tasks: tasks,
-        });
-    }).catch(error => {
-        res.status(500).json({ error: 'Internal Server Error' });
-    });
+        res.status(200).json({ mensage: 'Essa é a Rota inicial. As demais rotas dessa API são: /login, /profile (GET, PATCH), /tarefas (GET, POST), /tarefas/:id (CROUD), /tarefas/:id/concluida (PATCH).' });
 });
 
 app.post("/login", (req, res) => {
@@ -64,9 +54,9 @@ app.post("/login", (req, res) => {
         if (password === user.password) {
             const userId = user.id
             const token = jwt.sign({ userId }, process.env.senha, { expiresIn: 300 });
-            res.status(200).json(token);
+            res.status(200).json(token);                
         } else {
-            res.status(200).json("Senha incorreta");
+            res.status(200).json("senha incorretos");                
         }
     })
 });
@@ -79,8 +69,40 @@ app.get("/profile", verifyJWT, (req, res) => {
     });
 });
 
-app.patch("/profile", verifyJWT, (res, req) => {
+app.patch("/profile", verifyJWT, (req, res) => {
+    const { username, password } = req.body;
 
+    Users.findOne({
+        where: { username: username }
+    }).then(existingUser => {
+        if (existingUser) {
+            res.status(400).json({ message: 'Não é possível usar esse username, pois já está sendo utilizado.' });
+        } else {
+            Users.findOne({
+                where: { id: req.userId }
+            }).then(user => {
+                if (user) {
+                    user.update({
+                        username: username,
+                        password: password
+                    }).then(() => {
+                        res.status(200).json({ message: 'Usuário atualizado com sucesso.' });
+                    }).catch(err => {
+                        console.error(err);
+                        res.status(500).json({ message: 'Erro ao atualizar o usuário.' });
+                    });
+                } else {
+                    res.status(404).json({ message: 'Usuário não encontrado.' });
+                }
+            }).catch(err => {
+                console.error(err);
+                res.status(500).json({ message: 'Erro ao buscar o usuário.' });
+            });
+        }
+    }).catch(err => {
+        console.error(err);
+        res.status(500).json({ message: 'Erro ao verificar o username na tabela.' });
+    });
 });
 
 app.get("/tarefas", verifyJWT, (req, res) => {
